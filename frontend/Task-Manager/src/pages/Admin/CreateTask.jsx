@@ -6,7 +6,7 @@ import { API_PATHS } from "../../utils/apiPaths";
 import toast from "react-hot-toast";
 import { useLocation, useNavigate } from "react-router-dom";
 import moment from "moment";
-import { LuTrash2 } from "react-icons/lu";
+import { LuTrash2, LuSparkles } from "react-icons/lu";
 import SelectDropdown from "../../components/Inputs/SelectDropdown";
 import SelectUsers from "../../components/Inputs/SelectUsers";
 import TodoListInput from "../../components/Inputs/TodoListInput";
@@ -33,8 +33,34 @@ const CreateTask = () => {
 
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [aiLoading, setAiLoading] = useState(false);
 
   const [openDeleteAlert, setOpenDeleteAlert] = useState(false);
+
+  const generateWithAI = async () => {
+    if (!taskData.title.trim()) {
+      toast.error("Enter a task title first");
+      return;
+    }
+    setAiLoading(true);
+    try {
+      const response = await axiosInstance.post(API_PATHS.AI.GENERATE_TASK, {
+        title: taskData.title,
+      });
+      const { description, priority, checklist } = response.data;
+      setTaskData((prev) => ({
+        ...prev,
+        description: description || prev.description,
+        priority: priority || prev.priority,
+        todoChecklist: checklist || prev.todoChecklist,
+      }));
+      toast.success("AI generated task details!");
+    } catch (error) {
+      toast.error("AI generation failed. Try again.");
+    } finally {
+      setAiLoading(false);
+    }
+  };
 
   const handleValueChange = (key, value) => {
     setTaskData((prevData) => ({ ...prevData, [key]: value }));
@@ -226,14 +252,26 @@ const CreateTask = () => {
                 Task Title
               </label>
 
-              <input
-                placeholder="Create App UI"
-                className="form-input"
-                value={taskData.title}
-                onChange={({ target }) =>
-                  handleValueChange("title", target.value)
-                }
-              />
+              <div className="flex gap-2 items-start">
+                <input
+                  placeholder="Create App UI"
+                  className="form-input flex-1"
+                  value={taskData.title}
+                  onChange={({ target }) =>
+                    handleValueChange("title", target.value)
+                  }
+                />
+                <button
+                  type="button"
+                  onClick={generateWithAI}
+                  disabled={aiLoading}
+                  className="flex items-center gap-1.5 text-[13px] font-medium text-violet-600 bg-violet-50 rounded px-3 py-2 border border-violet-200 hover:bg-violet-100 hover:border-violet-400 transition-all cursor-pointer whitespace-nowrap mt-0 disabled:opacity-60 disabled:cursor-not-allowed"
+                  title="Auto-fill description, priority and checklist using AI"
+                >
+                  <LuSparkles className="text-base" />
+                  {aiLoading ? "Generating..." : "Generate with AI"}
+                </button>
+              </div>
             </div>
 
             <div className="mt-3">

@@ -3,9 +3,9 @@ export const BASE_URL = import.meta.env.VITE_API_BASE_URL || "https://taskmanage
 // utils/apiPaths.js
 export const API_PATHS = {
   AUTH: {
-    REGISTER: "/api/auth/register", // Register a new user (Admin or Member)
-    LOGIN: "/api/auth/login", // Authenticate user & return JWT token
-    GET_PROFILE: "/api/auth/profile", // Get logged-in user details
+    REGISTER: "/api/auth/register",
+    LOGIN: "/api/auth/login",
+    GET_PROFILE: "/api/auth/profile",
   },
 
   USERS: {
@@ -36,5 +36,9 @@ export const API_PATHS = {
 
   IMAGE: {
     UPLOAD_IMAGE: "api/auth/upload-image",
+  },
+
+  AI: {
+    GENERATE_TASK: "/api/ai/generate-task",
   },
 };
